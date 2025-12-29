@@ -9,4 +9,12 @@ export class Transaction {
     this.toAddress = toAddress;
     this.amount = amount;
   }
-}
+
+  toString(): string {
+    return JSON.stringify({
+      from: this.fromAddress,
+      to: this.toAddress,
+      amount: this.amount
+      });
+    }
+  }
