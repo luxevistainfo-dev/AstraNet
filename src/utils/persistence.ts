@@ -1,4 +1,5 @@
-// src/utils/persistence.ts
+# Overwrite the file with the correct TypeScript code
+cat > src/utils/persistence.ts <<'EOF'
 import * as fs from "fs";
 import * as path from "path";
 
@@ -26,3 +27,4 @@ export function saveChain(chainData: any): void {
 export function loadChain(): { chain?: any[]; pending?: any[] } | null {
   return loadJSON(CHAIN_PATH);
 }
+EOF
