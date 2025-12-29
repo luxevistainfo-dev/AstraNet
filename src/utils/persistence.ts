@@ -1,14 +1,17 @@
-import fs from "fs";
-import { Blockchain } from "../core/blockchain";
+// src/utils/persistence.ts
+import * as fs from "fs";
+import * as path from "path";
 
-const FILE = "chain.json";
-
-export function saveChain(chain: Blockchain): void {
-  fs.writeFileSync(FILE, JSON.stringify(chain, null, 2));
+export function saveJSON(filePath: string, data: any): void {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
 }
 
-export function loadChain(): Blockchain | null {
-  if (!fs.existsSync(FILE)) return null;
-  const data = fs.readFileSync(FILE, "utf-8");
-  return JSON.parse(data);
+export function loadJSON<T = any>(filePath: string): T | null {
+  if (!fs.existsSync(filePath)) return null;
+  const raw = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(raw) as T;
 }
