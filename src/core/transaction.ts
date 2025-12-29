@@ -1,20 +1,28 @@
-export class Transaction {
-  public fromAddress: string;
-  public toAddress: string;
-  public amount: number;
-  public signature?: string;
+// src/utils/persistence.ts
+import * as fs from "fs";
+import * as path from "path";
 
-  constructor(fromAddress: string, toAddress: string, amount: number) {
-    this.fromAddress = fromAddress;
-    this.toAddress = toAddress;
-    this.amount = amount;
+export function saveJSON(filePath: string, data: any): void {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+}
 
-  toString(): string {
-    return JSON.stringify({
-      from: this.fromAddress,
-      to: this.toAddress,
-      amount: this.amount
-      });
-    }
-  }
+export function loadJSON<T = any>(filePath: string): T | null {
+  if (!fs.existsSync(filePath)) return null;
+  const raw = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(raw) as T;
+}
+
+// Convenience wrappers specifically for blockchain persistence
+const CHAIN_PATH = "data/chain.json";
+
+export function saveChain(chainData: any): void {
+  saveJSON(CHAIN_PATH, chainData);
+}
+
+export function loadChain(): { chain?: any[]; pending?: any[] } | null {
+  return loadJSON(CHAIN_PATH);
+}
