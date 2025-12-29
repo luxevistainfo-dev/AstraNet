@@ -1,0 +1,29 @@
+
+### `WHITEPAPER.md`
+```markdown
+# AstraNet Whitepaper
+
+## Abstract
+AstraNet is a decentralized testnet integrating blockchain mechanics with AI-driven features.
+
+## Introduction
+Inspired by Bitcoin, AstraNet introduces fees, burn, staking, and dynamic pricing.
+
+## Core Design
+- Blocks and transactions
+- Mining with proof-of-work
+- Wallets with RSA keys
+
+## Economy
+- Fees (1%)
+- Burn (2%)
+- Staking rewards
+- Supply tracking
+- Dynamic price based on active users
+
+## AI Integration
+- AI helper for transaction analysis
+- Future integration with external AI APIs
+
+## Conclusion
+AstraNet demonstrates how blockchain and AI can merge into a transparent, auditable system.
