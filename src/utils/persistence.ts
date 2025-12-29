@@ -1,30 +1,35 @@
-# Overwrite the file with the correct TypeScript code
-cat > src/utils/persistence.ts <<'EOF'
-import * as fs from "fs";
-import * as path from "path";
+import { Application } from "express";
+import { Blockchain } from "../core/blockchain";
+import { Transaction } from "../core/transaction";
 
-export function saveJSON(filePath: string, data: any): void {
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+export function setupRoutes(app: Application, blockchain: Blockchain): void {
+  app.get("/api/chain", (req, res) => {
+    res.json(blockchain.chain);
+  });
+
+  app.get("/api/balance/:address", (req, res) => {
+    const balance = blockchain.getBalanceOfAddress(req.params.address);
+    res.json({ address: req.params.address, balance });
+  });
+
+  app.post("/api/transactions", (req, res) => {
+    const { from, to, amount } = req.body || {};
+    if (!from || !to || typeof amount !== "number") {
+      return res.status(400).json({ error: "Invalid transaction" });
+    }
+    const tx = new Transaction(from, to, amount);
+    try {
+      blockchain.addTransaction(tx);
+      return res.json({ status: "ok", message: "Transaction added" });
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message || "Failed to add transaction" });
+    }
+  });
+
+  app.post("/api/mine", (req, res) => {
+    const { minerAddress } = req.body || {};
+    if (!minerAddress) return res.status(400).json({ error: "minerAddress required" });
+    blockchain.minePendingTransactions(minerAddress);
+    return res.json({ status: "ok", message: "Block mined" });
+  });
 }
-
-export function loadJSON<T = any>(filePath: string): T | null {
-  if (!fs.existsSync(filePath)) return null;
-  const raw = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(raw) as T;
-}
-
-// Convenience wrappers for blockchain persistence
-const CHAIN_PATH = "data/chain.json";
-
-export function saveChain(chainData: any): void {
-  saveJSON(CHAIN_PATH, chainData);
-}
-
-export function loadChain(): { chain?: any[]; pending?: any[] } | null {
-  return loadJSON(CHAIN_PATH);
-}
-EOF
