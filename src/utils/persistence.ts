@@ -15,3 +15,14 @@ export function loadJSON<T = any>(filePath: string): T | null {
   const raw = fs.readFileSync(filePath, "utf8");
   return JSON.parse(raw) as T;
 }
+
+// Convenience wrappers for blockchain persistence
+const CHAIN_PATH = "data/chain.json";
+
+export function saveChain(chainData: any): void {
+  saveJSON(CHAIN_PATH, chainData);
+}
+
+export function loadChain(): { chain?: any[]; pending?: any[] } | null {
+  return loadJSON(CHAIN_PATH);
+}
