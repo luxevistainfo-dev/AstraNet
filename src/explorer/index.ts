@@ -5,6 +5,8 @@ import { setupRoutes } from "./routes";
 const app = express();
 const PORT = 4000;
 
+app.use(express.json()); // <--- важно
+
 const blockchain = new Blockchain();
 setupRoutes(app, blockchain);
 
