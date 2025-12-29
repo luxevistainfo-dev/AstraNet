@@ -18,20 +18,19 @@ export class Blockchain {
 
     const saved = loadJSON<{ chain: any[]; pending: any[] }>(STORAGE_PATH);
     if (saved && saved.chain && saved.chain.length > 0) {
-      // reconstruct blocks and transactions
-      this.chain = saved.chain.map((b, idx) => {
-        const txs = (b.transactions || []).map((t: any) => new Transaction(t.fromAddress, t.toAddress, t.amount));
+      // reconstruct blocks and transactions with explicit types
+      this.chain = saved.chain.map((b: any, idx: number) => {
+        const txs = (b.transactions || []).map((t: any) => new Transaction(t.fromAddress ?? null, t.toAddress, t.amount));
         const block = new Block(b.index, b.timestamp, txs, b.previousHash);
         block.nonce = b.nonce || 0;
         block.hash = b.hash || block.calculateHash();
         return block;
       });
-      this.pendingTransactions = (saved.pending || []).map((t: any) => new Transaction(t.fromAddress, t.toAddress, t.amount));
+      this.pendingTransactions = (saved.pending || []).map((t: any) => new Transaction(t.fromAddress ?? null, t.toAddress, t.amount));
       console.log("Loaded chain from disk, length:", this.chain.length);
     } else {
       this.chain = [this.createGenesisBlock()];
       this.pendingTransactions = [];
-      // save initial state
       this.persist();
       console.log("Blockchain initialized and first block mined.");
     }
@@ -57,6 +56,7 @@ export class Blockchain {
     block.mineBlock(this.difficulty);
 
     this.chain.push(block);
+    // reward is added to pendingTransactions (will be available after next mine)
     this.pendingTransactions = [
       new Transaction(null, minerAddress, this.miningReward)
     ];
